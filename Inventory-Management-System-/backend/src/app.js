@@ -1,10 +1,21 @@
 const express = require("express");
 const cors = require("cors");
+const connectDB = require("./config/db");
 const app = express();
 
 const authRoutes = require("./routes/authRoutes");
 const inventoryRoutes = require("./routes/inventoryRoutes");
 const errorHandler = require("./middleware/errorMiddleware");
+
+// Middleware to ensure DB connection on each request (for serverless)
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Database connection failed" });
+  }
+});
 
 // Middleware
 // Allow both localhost (for development) and deployed frontend URLs
